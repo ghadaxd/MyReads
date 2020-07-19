@@ -1,16 +1,36 @@
 import React from "react";
 import Bookshelf from "./Bookshelf";
-// import * as BooksAPI from './BooksAPI'
+import { getAll } from "../BooksAPI";
 
 class Library extends React.Component {
-  // It will get the data of books and send it to the shelf that its belong to.
   state = {
-    bookshelfTypes: [
-      { id: 0, shelfType: "Currently Reading" },
-      { id: 1, shelfType: "Want to Read" },
-      { id: 2, shelfType: "Read" },
-    ],
+    bookshelfTypes: [],
   };
+
+  componentDidMount() {
+    getAll().then((data) => {
+      const booksWantToRead = data.filter(
+        (book) => book.shelf === "wantToRead"
+      );
+      const booksCurrentlyReading = data.filter(
+        (book) => book.shelf === "currentlyReading"
+      );
+      const booksRead = data.filter((book) => book.shelf === "read");
+
+      this.setState({
+        bookshelfTypes: [
+          {
+            id: 0,
+            shelfType: "Currently Reading",
+            books: booksCurrentlyReading,
+          },
+          { id: 1, shelfType: "Want to Read", books: booksWantToRead },
+          { id: 2, shelfType: "Read", books: booksRead },
+        ],
+      });
+    });
+  }
+
   render() {
     return (
       <div className="list-books">
@@ -19,9 +39,17 @@ class Library extends React.Component {
         </div>
         <div className="list-books-content">
           <div>
-            {this.state.bookshelfTypes.map((shelf) => (
-              <Bookshelf shelfTitle={shelf.shelfType} key={shelf.id} />
-            ))}
+            {this.state.bookshelfTypes.length === 0 ? (
+              <p>Loading ...</p>
+            ) : (
+              this.state.bookshelfTypes.map((shelf) => (
+                <Bookshelf
+                  shelfTitle={shelf.shelfType}
+                  books={shelf.books}
+                  key={shelf.id}
+                />
+              ))
+            )}
           </div>
         </div>
         <div className="open-search">

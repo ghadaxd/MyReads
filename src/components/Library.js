@@ -1,6 +1,7 @@
 import React from "react";
-import Bookshelf from "./Bookshelf";
-import { getAll } from "../BooksAPI";
+import { Link } from "react-router-dom";
+import { Bookshelf } from "./Bookshelf";
+import { getAll, update } from "../BooksAPI";
 
 class Library extends React.Component {
   state = {
@@ -8,6 +9,10 @@ class Library extends React.Component {
   };
 
   componentDidMount() {
+    this.getBooks();
+  }
+
+  getBooks = () => {
     getAll().then((data) => {
       const booksWantToRead = data.filter(
         (book) => book.shelf === "wantToRead"
@@ -21,15 +26,27 @@ class Library extends React.Component {
         bookshelfTypes: [
           {
             id: 0,
-            shelfType: "Currently Reading",
+            shelfType: "currentlyReading",
+            shelfTitle: "Currently Reading",
             books: booksCurrentlyReading,
           },
-          { id: 1, shelfType: "Want to Read", books: booksWantToRead },
-          { id: 2, shelfType: "Read", books: booksRead },
+          {
+            id: 1,
+            shelfType: "wantToRead",
+            shelfTitle: "Want to Read",
+            books: booksWantToRead,
+          },
+          { id: 2, shelfType: "read", shelfTitle: "Read", books: booksRead },
         ],
       });
     });
-  }
+  };
+
+  updateBook = (book, shelfType) => {
+    update(book, shelfType).then((data) => {
+      this.getBooks();
+    });
+  };
 
   render() {
     return (
@@ -44,18 +61,19 @@ class Library extends React.Component {
             ) : (
               this.state.bookshelfTypes.map((shelf) => (
                 <Bookshelf
-                  shelfTitle={shelf.shelfType}
+                  shelfTitle={shelf.shelfTitle}
                   books={shelf.books}
                   key={shelf.id}
+                  updateBook={this.updateBook}
                 />
               ))
             )}
           </div>
         </div>
         <div className="open-search">
-          <button onClick={() => this.setState({ showSearchPage: true })}>
-            Add a book
-          </button>
+          <Link to="/search">
+            <button>Add a book</button>
+          </Link>
         </div>
       </div>
     );

@@ -16,7 +16,10 @@ export const Book = (props) => {
             }}
           />
           <div className="book-shelf-changer">
-            <select>
+            <select
+              onChange={(e) => props.updateBook(data, e.target.value)}
+              value={data.shelf || "none"}
+            >
               <option value="move" disabled>
                 Move to...
               </option>
@@ -29,12 +32,13 @@ export const Book = (props) => {
         </div>
         <div className="book-title">{data.title}</div>
         <div className="book-authors">
-          {data.authors.map((author) => (
-            <span>
-              {author}
-              <br />
-            </span>
-          ))}
+          {data.authors &&
+            data.authors.map((author, index) => (
+              <span key={index}>
+                {author}
+                <br />
+              </span>
+            ))}
         </div>
       </div>
     </li>

@@ -1,6 +1,8 @@
 import React from "react";
 import "./App.css";
 
+import { Route } from "react-router-dom";
+
 import Library from "./components/Library";
 import SearchBooks from "./components/SearchBooks";
 
@@ -18,7 +20,8 @@ class BooksApp extends React.Component {
   render() {
     return (
       <div className="app">
-        {this.state.showSearchPage ? <SearchBooks /> : <Library />}
+        <Route exact path="/" component={Library} />
+        <Route exact path="/search" component={SearchBooks} />
       </div>
     );
   }

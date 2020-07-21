@@ -2,8 +2,6 @@ import React from "react";
 import { Book } from "./Book";
 
 export const Bookshelf = (props) => {
-  // Will have the data of books, that belongs to a certain shelf type, which been displayed.
-  // It will also have the functionality where of adding and removing a book from a shelf.
   const { shelfTitle, books } = props;
   return (
     <div className="bookshelf">

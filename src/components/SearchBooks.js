@@ -3,23 +3,53 @@ import { Link } from "react-router-dom";
 import { search } from "../BooksAPI";
 import { Book } from "./Book";
 
-import { update } from "../BooksAPI";
-
 class SearchBooks extends React.Component {
   state = {
-    query: "",
     results: [],
   };
 
   search = (query) => {
     search(query).then((data) => {
-      this.setState({ query, results: data });
+      if (data !== undefined && data.error === undefined) {
+        const results = data.map((book) => {
+          let shelfType = "none";
+          this.props.data.every((bookshelf) => {
+            const isFound = bookshelf.books.find(
+              (bookInLibrary) => bookInLibrary.id === book.id
+            );
+            if (isFound !== undefined) {
+              shelfType = bookshelf.shelfType;
+              return false;
+            }
+            return true;
+          });
+          return { ...book, shelf: shelfType };
+        });
+        this.setState({
+          results,
+        });
+      } else {
+        this.setState({
+          results: [],
+        });
+      }
     });
   };
 
   updateBook = (book, shelfType) => {
-    update(book, shelfType).then((data) => {
-      this.search(this.state.query);
+    this.props.updateBook(book, shelfType);
+    const updatedResults = this.state.results;
+    updatedResults.every((bookFromResults) => {
+      if (bookFromResults.id === book.id) {
+        bookFromResults.shelf = shelfType;
+        return false;
+      } else {
+        return true;
+      }
+    });
+
+    this.setState({
+      results: [...updatedResults],
     });
   };
 
@@ -45,7 +75,6 @@ class SearchBooks extends React.Component {
               this.state.results.map((book) => (
                 <Book data={book} key={book.id} updateBook={this.updateBook} />
               ))}
-            <li>{/* Here we will iterates books results to display them */}</li>
           </ol>
         </div>
       </div>
